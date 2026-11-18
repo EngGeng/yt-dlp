@@ -255,6 +255,21 @@ If you do not have the necessary dependencies for a task you are attempting, yt-
 
 ## COMPILE
 
+### macOS graphical interface
+
+Run `python3 -m yt_dlp.gui` or install the `yt-dlp-gui` command with the package. The interface uses Tkinter and the existing Python API; MP3 extraction requires FFmpeg.
+
+#### Standalone macOS binary
+
+The GUI can be packaged as a standalone universal2 macOS app for Intel and Apple Silicon Macs, distributed as one ZIP file. To target macOS 10.13 or later on Intel and macOS 11 or later on Apple Silicon, build it with the Python.org universal2 Python 3.13 installer (macOS 10.13+), then run:
+
+```
+python devscripts/install_deps.py --include-group pyinstaller
+python -m bundle.pyinstaller_gui
+```
+
+The app is written to `dist/yt-dlp-gui_macos.app`, and the shareable ZIP file to `dist/yt-dlp-gui_macos.zip`. PyInstaller must be run with a Python interpreter that includes both `x86_64` and `arm64` architectures; otherwise, build a matching single-architecture app with `python -m bundle.pyinstaller_gui --target-architecture=arm64` or `--target-architecture=x86_64`. MP3 extraction requires FFmpeg on the destination Mac.
+
 ### Standalone PyInstaller Builds
 To build the standalone executable, you must have Python and `pyinstaller` (plus any of yt-dlp's [optional dependencies](#dependencies) if needed). The executable will be built for the same CPU architecture as the Python used.
 
