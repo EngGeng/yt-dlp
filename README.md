@@ -259,6 +259,18 @@ If you do not have the necessary dependencies for a task you are attempting, yt-
 
 Run `python3 -m yt_dlp.gui` or install the `yt-dlp-gui` command with the package. The interface uses Tkinter and the existing Python API; MP3 extraction requires FFmpeg.
 
+Paste one HTTP or HTTPS link per line and click **解析链接** (Parse links). The interface lists the resources found and selects them by default; click the checkbox or use **全选** / **全不选** to change the selection. Choose the output directory and video or MP3, then click **下载所选** (Download selected). Each resource shows its status and download progress. You can parse more links and add selected resources while downloading; each batch keeps the directory and format selected when it was added.
+
+The app first lists all resources, then fetches each resource's format information and shows separate estimated video and MP3 source-audio download sizes for the selected resources. Size analysis can take time for large channels. Sizes still being fetched and unavailable sizes are counted separately; if format details cannot be fetched, available playlist metadata is used instead. Estimates may differ from actual downloads or converted MP3 files.
+
+Use **导出清单（CSV）** to save all listed resources, including unchecked ones, in an Excel-compatible UTF-8 CSV file. Video and source-audio sizes are in bytes; unavailable or incomplete sizes are marked **未解析**, and estimated sizes are identified separately. Exporting during analysis records the information available at that moment.
+
+After starting downloads, the app asks where to save a CSV download report before exiting, including when downloads were stopped. It records each task's result, download type and directory; waiting tasks stopped before starting are marked **未开始**. Canceling the save dialog or a save failure leaves the app open. If no download was started, no report is requested.
+
+On a later launch, use **导入下载报告** to restore failed, stopped and unstarted tasks to the list. Review the selected tasks and click **下载所选** to continue; each restored task uses its original type and directory, which must still exist. Restored sizes are shown as unknown. The latest status and any remaining unfinished tasks are included in the next report. Keep the original CSV unchanged for re-import, since spreadsheet editors may alter its values. Resuming a partially downloaded file depends on yt-dlp and the website; a task may need to download again.
+
+Channel, account and playlist links are expanded before downloading. Parsing can take time for large channels; **暂停解析** pauses at the next checkpoint after any current network request, and **继续解析** resumes. The count is of resources found, not a guarantee that every resource can be downloaded. Available content depends on the site and account access; for YouTube, a channel's main URL includes its available videos, Shorts and streams, while a tab URL selects that tab. Individual download failures are logged and do not stop the queue. **暂停** pauses after the current resource finishes; **继续** resumes. **停止全部** cancels the current download and discards waiting downloads. Cancellation takes effect when the downloader next checks for it, so an ongoing network request or processing step may take time to finish. Closing the app stops active work and discards waiting downloads.
+
 #### Standalone macOS binary
 
 The GUI can be packaged as a standalone universal2 macOS app for Intel and Apple Silicon Macs, distributed as one ZIP file. To target macOS 10.13 or later on Intel and macOS 11 or later on Apple Silicon, build it with the Python.org universal2 Python 3.13 installer (macOS 10.13+), then run:
@@ -268,7 +280,9 @@ python devscripts/install_deps.py --include-group pyinstaller
 python -m bundle.pyinstaller_gui
 ```
 
-The app is written to `dist/yt-dlp-gui_macos.app`, and the shareable ZIP file to `dist/yt-dlp-gui_macos.zip`. PyInstaller must be run with a Python interpreter that includes both `x86_64` and `arm64` architectures; otherwise, build a matching single-architecture app with `python -m bundle.pyinstaller_gui --target-architecture=arm64` or `--target-architecture=x86_64`. MP3 extraction requires FFmpeg on the destination Mac.
+The app is written to `dist/yt-dlp-gui_macos.app`, and the shareable ZIP file to `dist/yt-dlp-gui_macos.zip`. PyInstaller must be run with a Python interpreter that includes both `x86_64` and `arm64` architectures; otherwise, build a matching single-architecture app with `python -m bundle.pyinstaller_gui --target-architecture=arm64` or `--target-architecture=x86_64`.
+
+The app does not bundle FFmpeg. For MP3 extraction or merging separate audio and video streams, install FFmpeg on the destination Mac (for example, `brew install ffmpeg`, which also installs `ffprobe`). If the GUI cannot find both tools on its `PATH`, it checks `/opt/homebrew/bin`, `/usr/local/bin`, and `/opt/local/bin` for the pair. This also works when opening the app from Finder without a shell-configured `PATH`.
 
 ### Standalone PyInstaller Builds
 To build the standalone executable, you must have Python and `pyinstaller` (plus any of yt-dlp's [optional dependencies](#dependencies) if needed). The executable will be built for the same CPU architecture as the Python used.
